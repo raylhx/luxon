@@ -74,10 +74,10 @@ const lowOrderMatrix = {
         months: 3,
         weeks: daysInYearAccurate / 28,
         days: daysInYearAccurate / 4,
-        hours: (daysInYearAccurate * 24) / 4,
-        minutes: (daysInYearAccurate * 24 * 60) / 4,
-        seconds: (daysInYearAccurate * 24 * 60 * 60) / 4,
-        milliseconds: (daysInYearAccurate * 24 * 60 * 60 * 1000) / 4
+        hours: daysInYearAccurate * 24 / 4,
+        minutes: daysInYearAccurate * 24 * 60 / 4,
+        seconds: daysInYearAccurate * 24 * 60 * 60 / 4,
+        milliseconds: daysInYearAccurate * 24 * 60 * 60 * 1000 / 4
       },
       months: {
         weeks: daysInMonthAccurate / 7,
@@ -191,7 +191,7 @@ export default class Duration {
     /**
      * @access private
      */
-    this._isDuration = true;
+    this.isLuxonDuration = true;
   }
 
   /**
@@ -303,6 +303,15 @@ export default class Duration {
     if (!ignoreUnknown && !normalized) throw new InvalidUnitError(unit);
 
     return normalized;
+  }
+
+  /**
+   * Check if an object is a Duration. Works across context boundaries
+   * @param {object} o
+   * @return {boolean}
+   */
+  static isDuration(o) {
+    return o instanceof Duration || o.isLuxonDuration;
   }
 
   /**
@@ -725,11 +734,6 @@ export default class Duration {
       }
     }
     return true;
-  }
-
-  // TYPE CHECK
-  static isDuration(o) {
-    return (o instanceof Duration) || o._isDuration;
   }
 }
 

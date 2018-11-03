@@ -394,7 +394,7 @@ export default class DateTime {
     /**
      * @access private
      */
-    this._isDateTime = true;
+    this.isLuxonDateTime = true;
   }
 
   // CONSTRUCT
@@ -609,9 +609,7 @@ export default class DateTime {
     // make sure the values we have are in range
     const higherOrderInvalid = useWeekData
         ? hasInvalidWeekData(normalized)
-        : containsOrdinal
-          ? hasInvalidOrdinalData(normalized)
-          : hasInvalidGregorianData(normalized),
+        : containsOrdinal ? hasInvalidOrdinalData(normalized) : hasInvalidGregorianData(normalized),
       invalidReason = higherOrderInvalid || hasInvalidTimeData(normalized);
 
     if (invalidReason) {
@@ -621,9 +619,7 @@ export default class DateTime {
     // compute the actual time
     const gregorian = useWeekData
         ? weekToGregorian(normalized)
-        : containsOrdinal
-          ? ordinalToGregorian(normalized)
-          : normalized,
+        : containsOrdinal ? ordinalToGregorian(normalized) : normalized,
       [tsFinal, offsetFinal] = objToTS(gregorian, offsetProvis, zoneToUse),
       inst = new DateTime({
         ts: tsFinal,
@@ -773,6 +769,15 @@ export default class DateTime {
     } else {
       return new DateTime({ invalidReason: reason });
     }
+  }
+
+  /**
+   * Check if an object is a DateTime. Works across context boundaries
+   * @param {object} o
+   * @return {boolean}
+   */
+  static isDateTime(o) {
+    return o instanceof DateTime || o.isLuxonDateTime;
   }
 
   // INFO
@@ -1851,11 +1856,6 @@ export default class DateTime {
    */
   static get DATETIME_HUGE_WITH_SECONDS() {
     return Formats.DATETIME_HUGE_WITH_SECONDS;
-  }
-
-  // TYPE CHECK
-  static isDateTime(o) {
-    return (o instanceof DateTime) || o._isDateTime;
   }
 }
 

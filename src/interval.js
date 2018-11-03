@@ -39,6 +39,10 @@ export default class Interval {
      * @access private
      */
     this.invalid = config.invalidReason || null;
+    /**
+     * @access private
+     */
+    this.isLuxonInterval = true;
   }
 
   /**
@@ -128,6 +132,15 @@ export default class Interval {
       }
     }
     return Interval.invalid("invalid ISO format");
+  }
+
+  /**
+   * Check if an object is an Interval. Works across context boundaries
+   * @param {object} o
+   * @return {boolean}
+   */
+  static isDuration(o) {
+    return o instanceof Interval || o.isLuxonInterval;
   }
 
   /**
@@ -396,18 +409,16 @@ export default class Interval {
    * @return {[Interval]}
    */
   static merge(intervals) {
-    const [found, final] = intervals.sort((a, b) => a.s - b.s).reduce(
-      ([sofar, current], item) => {
-        if (!current) {
-          return [sofar, item];
-        } else if (current.overlaps(item) || current.abutsStart(item)) {
-          return [sofar, current.union(item)];
-        } else {
-          return [sofar.concat([current]), item];
-        }
-      },
-      [[], null]
-    );
+    const [found, final] = intervals.sort((a, b) => a.s - b.s).reduce(([sofar, current], item) => {
+      if (!current) {
+        return [sofar, item];
+      } else if (current.overlaps(item) || current.abutsStart(item)) {
+        return [sofar, current.union(item)];
+      } else {
+        return [sofar.concat([current]), item];
+      }
+    },
+    [[], null]);
     if (final) {
       found.push(final);
     }
